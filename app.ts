@@ -10,116 +10,20 @@ Events (belongs to Organization):- Name- Date / Time (can modify these columns t
 Bonus: When a user submits a location with an address, the latitude & longitude is gathered via the Google Places API.
  */
 import {UserEvent, Location, Organization, typeDefs} from "./graphql/types";
-
-const orgs: Organization[] = [
-  {
-    name: 'Germany',
-    createdAt: new Date("1/21/2020"),
-    updatedAt: new Date("1/21/2020"),
-    id: 1
-  },
-  {
-    name: 'Germany',
-    createdAt: new Date("1/21/2020"),
-    updatedAt: new Date("1/21/2020"),
-    id: 2,
-  },
-];
-
-const events: UserEvent[] = [
-  {
-    id: 1,
-    name: 'Germany',
-    dateTime: new Date("1/21/2020"),
-  },
-  {
-    id: 2,
-    name: 'Italy',
-    dateTime: new Date("1/21/2020"),
-  },
-];
-
-const locations: Location[] = [
-  {
-    id: 1,
-    name: 'Germany',
-    address: '1231 Main St, San Francisco, CA 94303',
-    latitude: '122',
-    longitude: '1231',
-    createdAt: new Date("1/21/2020"),
-    updatedAt: new Date("1/21/2020"),
-  },
-  {
-    id: 2,
-    name: 'Italy',
-    address: '1231 Main St, San Francisco, CA 94303',
-    latitude: '122',
-    longitude: '1231',
-    createdAt: new Date("1/21/2020"),
-    updatedAt: new Date("1/21/2020"),
-  },
-  {
-    id: 3,
-    name: 'Dj Kaled',
-    address: '1231 Main St, San Francisco, CA 94303',
-    latitude: '122',
-    longitude: '1231',
-    createdAt: new Date("1/21/2020"),
-    updatedAt: new Date("1/21/2020"),
-  },
-  {
-    id: 4,
-    name: 'JBieber',
-    address: '1231 Main St, San Francisco, CA 94303',
-    latitude: '122',
-    longitude: '1231',
-    createdAt: new Date("1/21/2020"),
-    updatedAt: new Date("1/21/2020"),
-  },
-];
+import {
+  addEvent,
+  addLocation,
+  addOrg,
+  deleteEvent,
+  deleteLocation,
+  deleteOrg,
+  locations,
+  orgs,
+  events
+} from "./graphql/controllers";
 
 const { ApolloServer, gql } = require('apollo-server');
 
-const addLocation = (root, args, context) => {
-    const { name, address, latitude, longitude } = args;
-    const newLocation = {
-      name: name,
-      address,
-      latitude,
-      longitude,
-      id: Number(new Date()),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    }
-    locations.push(newLocation);
-
-    return newLocation;
-}
-
-const addEvent = (root, args, context) => {
-  const { name } = args;
-  const newEvent = {
-    name: name,
-    id: Number(new Date()),
-    dateTime: new Date(),
-  }
-  events.push(newEvent);
-
-  return newEvent;
-}
-
-const addOrg = (root, args, context) => {
-  const { name } = args;
-  const newOrg = {
-    name: name,
-    id: Number(new Date()),
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  }
-  orgs.push(newOrg);
-
-  return newOrg;
-}
 
 const resolvers = {
   Query: {
@@ -131,8 +35,9 @@ const resolvers = {
     addOrganization: addOrg,
     addEvent: addEvent,
     addLocation: addLocation,
-
-
+    deleteOrganization: deleteOrg,
+    deleteEvent: deleteEvent,
+    deleteLocation: deleteLocation,
   }
 };
 
