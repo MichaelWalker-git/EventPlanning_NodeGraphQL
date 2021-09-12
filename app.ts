@@ -1,37 +1,5 @@
-import express from 'express';
-const createError = require('http-errors');
-const path = require('path');
-const cookieParser = require('cookie-parser');
-const logger = require('morgan');
-
-const indexRouter = require('./routes');
-const locationRouter = require('./routes');
-const organizationRouter = require('./routes');
-const eventRouter = require('./routes');
-
-const { graphql, buildSchema } = require('graphql');
-
-const app = express();
-const port = 3000;
-
-app.listen(port, () => {
-  console.log(`Timezones by location application is running on port ${port}.`);
-});
-
 /**
  *
-Please implement a Node.JS server with a GraphQL based API that has the abilities to
- Create Locations
- Read Locations
- Update Locations
- Delete Locations
- Create Events
- Read Events
- Update Events
- Delete Events
-
- query and find all the locations & events belonging to an organization
- query a location(s) / event(s) and having the ability to find the organization it belongs to.
 
 This is what the schema of the the (persistent) database should look like:
 Organization- Name- CreatedAt- UpdatedAt
@@ -41,31 +9,138 @@ Events (belongs to Organization):- Name- Date / Time (can modify these columns t
 
 Bonus: When a user submits a location with an address, the latitude & longitude is gathered via the Google Places API.
  */
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
+import {UserEvent, Location, Organization, typeDefs} from "./graphql/types";
 
-app.use(logger('dev'));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+const orgs: Organization[] = [
+  {
+    name: 'Germany',
+    createdAt: new Date("1/21/2020"),
+    updatedAt: new Date("1/21/2020"),
+    id: 1
+  },
+  {
+    name: 'Germany',
+    createdAt: new Date("1/21/2020"),
+    updatedAt: new Date("1/21/2020"),
+    id: 2,
+  },
+];
 
-app.use('/', indexRouter);
-app.use('/event', eventRouter);
-app.use('/organization', organizationRouter);
-app.use('/location', locationRouter);
+const events: UserEvent[] = [
+  {
+    id: 1,
+    name: 'Germany',
+    dateTime: new Date("1/21/2020"),
+  },
+  {
+    id: 2,
+    name: 'Italy',
+    dateTime: new Date("1/21/2020"),
+  },
+];
 
-app.use(function(req, res, next) {
-  next(createError(404));
+const locations: Location[] = [
+  {
+    id: 1,
+    name: 'Germany',
+    address: '1231 Main St, San Francisco, CA 94303',
+    latitude: '122',
+    longitude: '1231',
+    createdAt: new Date("1/21/2020"),
+    updatedAt: new Date("1/21/2020"),
+  },
+  {
+    id: 2,
+    name: 'Italy',
+    address: '1231 Main St, San Francisco, CA 94303',
+    latitude: '122',
+    longitude: '1231',
+    createdAt: new Date("1/21/2020"),
+    updatedAt: new Date("1/21/2020"),
+  },
+  {
+    id: 3,
+    name: 'Dj Kaled',
+    address: '1231 Main St, San Francisco, CA 94303',
+    latitude: '122',
+    longitude: '1231',
+    createdAt: new Date("1/21/2020"),
+    updatedAt: new Date("1/21/2020"),
+  },
+  {
+    id: 4,
+    name: 'JBieber',
+    address: '1231 Main St, San Francisco, CA 94303',
+    latitude: '122',
+    longitude: '1231',
+    createdAt: new Date("1/21/2020"),
+    updatedAt: new Date("1/21/2020"),
+  },
+];
+
+const { ApolloServer, gql } = require('apollo-server');
+
+const addLocation = (root, args, context) => {
+    const { name, address, latitude, longitude } = args;
+    const newLocation = {
+      name: name,
+      address,
+      latitude,
+      longitude,
+      id: Number(new Date()),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }
+    locations.push(newLocation);
+
+    return newLocation;
+}
+
+const addEvent = (root, args, context) => {
+  const { name } = args;
+  const newEvent = {
+    name: name,
+    id: Number(new Date()),
+    dateTime: new Date(),
+  }
+  events.push(newEvent);
+
+  return newEvent;
+}
+
+const addOrg = (root, args, context) => {
+  const { name } = args;
+  const newOrg = {
+    name: name,
+    id: Number(new Date()),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  }
+  orgs.push(newOrg);
+
+  return newOrg;
+}
+
+const resolvers = {
+  Query: {
+    organizations: () => orgs,
+    events: () => events,
+    locations: () => locations,
+  },
+  Mutation: {
+    addOrganization: addOrg,
+    addEvent: addEvent,
+    addLocation: addLocation,
+
+
+  }
+};
+
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
 });
 
-// error handler
-app.use(function(err, req, res, next) {
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  res.status(err.status || 500);
-  res.render('error');
+server.listen().then(({ url }) => {
+  console.log(`🚀 Server ready at ${url}`);
 });
-
-module.exports = app;
