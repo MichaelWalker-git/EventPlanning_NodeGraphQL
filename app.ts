@@ -9,7 +9,7 @@ Events (belongs to Organization):- Name- Date / Time (can modify these columns t
 
 Bonus: When a user submits a location with an address, the latitude & longitude is gathered via the Google Places API.
  */
-import {UserEvent, Location, Organization, typeDefs} from "./graphql/types";
+import {typeDefs} from "./graphql/types";
 import {
   addEvent,
   addLocation,
@@ -19,7 +19,7 @@ import {
   deleteOrg,
   locations,
   orgs,
-  events
+  events, updateOrganization, updateEvent, updateLocation
 } from "./graphql/controllers";
 
 const { ApolloServer, gql } = require('apollo-server');
@@ -38,6 +38,9 @@ const resolvers = {
     deleteOrganization: deleteOrg,
     deleteEvent: deleteEvent,
     deleteLocation: deleteLocation,
+    updateOrganization: updateOrganization,
+    updateEvent: updateEvent,
+    updateLocation: updateLocation,
   }
 };
 
