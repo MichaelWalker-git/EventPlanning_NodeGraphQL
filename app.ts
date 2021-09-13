@@ -1,14 +1,3 @@
-/**
- *
-
-This is what the schema of the the (persistent) database should look like:
-Organization- Name- CreatedAt- UpdatedAt
-Locations (belongs to Organization):- Name- Address- Latitude- Longitude- CreatedAt- UpdatedAt
-Events (belongs to Organization):- Name- Date / Time (can modify these columns to fit your needs better.
- - Doesn’t have to be exactly one column)- Description- CreatedAt- UpdatedAt
-
-Bonus: When a user submits a location with an address, the latitude & longitude is gathered via the Google Places API.
- */
 import {typeDefs} from "./graphql/types";
 import {
   addEvent,
@@ -17,19 +6,20 @@ import {
   deleteEvent,
   deleteLocation,
   deleteOrg,
-  locations,
-  orgs,
-  events, updateOrganization, updateEvent, updateLocation
+  updateOrganization,
+  updateEvent,
+  updateLocation,
+  getEvents,
+  getOrganizations, getLocations
 } from "./graphql/controllers";
 
-const { ApolloServer, gql } = require('apollo-server');
-
+const {ApolloServer} = require('apollo-server');
 
 const resolvers = {
   Query: {
-    organizations: () => orgs,
-    events: () => events,
-    locations: () => locations,
+    organizations: getOrganizations,
+    events: getEvents,
+    locations: getLocations,
   },
   Mutation: {
     addOrganization: addOrg,
@@ -49,6 +39,6 @@ const server = new ApolloServer({
   resolvers,
 });
 
-server.listen().then(({ url }) => {
+server.listen().then(({url}) => {
   console.log(`🚀 Server ready at ${url}`);
 });
