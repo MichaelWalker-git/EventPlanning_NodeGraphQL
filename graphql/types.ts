@@ -4,6 +4,8 @@ export interface UserEvent {
     name: string;
     dateTime: Date;
     id: number;
+    organization?: Organization;
+    orgId?: number;
 }
 
 export interface Location {
@@ -14,6 +16,8 @@ export interface Location {
     createdAt: Date;
     updatedAt: Date;
     id: number;
+    organization?: Organization;
+    orgId?: number;
 }
 
 export interface Organization {
@@ -30,13 +34,23 @@ export const typeDefs = gql`
         updatedAt: String
     }
 
+    type Organization implements BaseDetails {
+        id: ID
+        name: String
+        createdAt: String
+        updatedAt: String
+        event: [Event!]
+        location: [Location!]
+    }
+
     type Event {
         id: ID
         name: String
         dateTime: String
+        organization: Organization!
     }
 
-    type Location {
+    type Location implements BaseDetails {
         id: ID
         address: String
         latitude: String
@@ -44,25 +58,13 @@ export const typeDefs = gql`
         name: String
         createdAt: String
         updatedAt: String
-    }
-
-    type Organization {
-        id: ID
-        name: String
-        createdAt: String
-        updatedAt: String
+        organization: Organization!
     }
 
     interface MutationResponse {
         code: String!
         success: Boolean!
         message: String!
-    }
-
-    type Query {
-        organizations: [Organization],
-        events: [Event],
-        locations: [Location],
     }
 
     type UpdateOrgMutationResponse implements MutationResponse {
@@ -90,6 +92,12 @@ export const typeDefs = gql`
         code: String!
         success: Boolean!
         message: String!
+    }
+
+    type Query {
+        organizations: [Organization],
+        events: [Event],
+        locations: [Location],
     }
     
     type Mutation {
